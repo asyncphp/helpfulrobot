@@ -1,0 +1,16 @@
+{
+    "scripts": {
+        "serve": "vendor/bin/aerys -d -c config.php"
+    },
+    "require": {
+        "amphp/aerys": "^0.4.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "HelpfulRobot\\": "app"
+        }
+    },
+    "config": {
+        "process-timeout": 0
+    }
+}
