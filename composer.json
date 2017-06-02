@@ -1,6 +1,7 @@
 {
     "scripts": {
-        "serve": "vendor/bin/aerys -d -c config.php"
+        "serve": "vendor/bin/aerys -d -c config.php",
+        "serve:watch": "scripts/serve-watch"
     },
     "require": {
         "amphp/aerys": "^0.4.7"
@@ -9,6 +10,9 @@
         "psr-4": {
             "HelpfulRobot\\": "app"
         }
+    },
+    "require-dev": {
+        "yosymfony/resource-watcher": "^1.2"
     },
     "config": {
         "process-timeout": 0

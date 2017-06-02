@@ -1,0 +1,49 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . "/../vendor/autoload.php";
+require_once __DIR__ . "/../helpers.php";
+
+use Symfony\Component\Finder\Finder;
+use Yosymfony\ResourceWatcher\ResourceWatcher;
+use Yosymfony\ResourceWatcher\ResourceCacheFile;
+
+use function HelpfulRobot\Process\start;
+use function HelpfulRobot\Process\stop;
+
+$finder = new Finder();
+
+$finder->files()
+    ->name("*.php")
+    ->in(__DIR__ . "/../app");
+
+$cache = new ResourceCacheFile(
+    __DIR__ . "/.dev-changes.php"
+);
+
+$watcher = new ResourceWatcher($cache);
+$watcher->setFinder($finder);
+
+start(
+    "hr-watcher",
+    "vendor/bin/aerys -d -c config.php",
+    "aerys.log"
+);
+
+while (true) {
+    $watcher->findChanges();
+
+    if ($watcher->hasChanges()) {
+        print "Restarting the server" . PHP_EOL;
+
+        stop("hr-watcher");
+
+        start(
+            "hr-watcher",
+            "vendor/bin/aerys -d -c config.php",
+            "aerys.log"
+        );
+    }
+
+    usleep(100000);
+}
