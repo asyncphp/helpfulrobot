@@ -1,5 +1,7 @@
 <?php
 
+process .."/helpers.pre";
+
 use Aerys\Host;
 use Aerys\Request;
 use Aerys\Response;
@@ -7,12 +9,12 @@ use Aerys\Response;
 use function Aerys\root;
 use function Aerys\router;
 
-$host = new Host();
+$host = Host->new();
 $host->expose("*", 8888);
 
 $host->use($router = router());
 
-$routes = require __DIR__ . "/routes.php";
+$routes = process .."/routes.pre";
 $routes($router);
 
 $host->use($root = root(__DIR__ . "/public"));

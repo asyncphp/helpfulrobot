@@ -1,0 +1,12 @@
+<?php
+
+macro ·recursion {
+    ·ns()·name -> new
+    ·chain(
+        ·token("("),
+        ·optional(·layer()),
+        ·token(")")
+    )·parameters
+} >> {
+    (new ·name ·parameters)
+}

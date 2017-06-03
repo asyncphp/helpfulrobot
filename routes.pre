@@ -4,9 +4,16 @@ use Aerys\Request;
 use Aerys\Response;
 use Aerys\Router;
 use HelpfulRobot\Responder\IndexResponder;
+use HelpfulRobot\Responder\RobotsResponder;
 
 return function (Router $router) {
-    $router->get("/", (new IndexResponder())->closure());
+    $router->get(
+        "/", IndexResponder->new()->closure()
+    );
+
+    $router->get(
+        "/robots", RobotsResponder->new()->closure()
+    );
 
     // $router->get(
     //     "/{name}", function(Request $req, Response $res, array $params) {

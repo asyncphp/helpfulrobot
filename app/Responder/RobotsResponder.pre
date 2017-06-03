@@ -1,0 +1,26 @@
+<?php
+
+namespace HelpfulRobot\Responder;
+
+use Aerys\Request;
+use Aerys\Response;
+
+use function Amp\File\get;
+
+class RobotsResponder
+{
+    use Responds;
+
+    public function run(Request $req, Response $res)
+    {
+        $robots = await $this->robots();
+        $res->end("robots: {$robots}");
+    }
+
+    async private function robots()
+    {
+        return await get(
+            __DIR__ . "/../../public/robots.txt"
+        );
+    }
+}
