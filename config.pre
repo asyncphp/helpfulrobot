@@ -17,4 +17,4 @@ $host->use($router = router());
 $routes = process .."/routes.pre";
 $routes($router);
 
-$host->use($root = root(__DIR__ . "/public"));
+$host->use($root = root(.."/public"));
