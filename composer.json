@@ -1,7 +1,10 @@
 {
     "scripts": {
         "serve": "vendor/bin/aerys -d -c loader.php",
-        "serve:watch": "scripts/serve-watch"
+        "serve:watch": "scripts/serve-watch",
+        "test": "vendor/bin/phpunit",
+        "test:coverage": "vendor/bin/phpunit --coverage-html coverage",
+        "test:watch": "scripts/test-watch"
     },
     "require": {
         "amphp/aerys": "^0.4.7",
@@ -14,9 +17,16 @@
         }
     },
     "require-dev": {
+        "phpunit/phpunit": "^6.2",
         "yosymfony/resource-watcher": "^1.2"
     },
+    "autoload-dev": {
+        "psr-4": {
+            "HelpfulRobot\\Tests\\": "tests"
+        }
+    },
     "config": {
-        "process-timeout": 0
+        "process-timeout": 0,
+        "sort-packages": true
     }
 }

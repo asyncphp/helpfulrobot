@@ -14,9 +14,13 @@ namespace HelpfulRobot\Process
 
     function identify($tag)
     {
-        exec("ps -ax | grep tag={$tag}", $lines);
-        $parts = explode(" ", trim($lines[0]));
+        exec("ps -ax | grep '[t]ag={$tag}'", $lines);
 
+        if (count($lines) < 1) {
+            return null;
+        }
+
+        $parts = explode(" ", trim($lines[0]));
         return (int) $parts[0];
     }
 
@@ -24,10 +28,8 @@ namespace HelpfulRobot\Process
     {
         $pid = identify($tag);
 
-        if ($pid < 1) {
-            return;
+        if ($pid !== null) {
+            exec("kill -9 {$pid}");
         }
-
-        exec("kill -9 {$pid}");
     }
 }

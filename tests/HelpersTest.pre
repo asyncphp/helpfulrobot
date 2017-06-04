@@ -1,0 +1,54 @@
+<?php
+
+namespace HelpfulRobot\Tests;
+
+use PHPUnit\Framework\TestCase;
+
+use function HelpfulRobot\Process\identify;
+use function HelpfulRobot\Process\start;
+use function HelpfulRobot\Process\stop;
+
+class HelpersTest extends TestCase
+{
+    /**
+     * @test
+     * @covers HelpfulRobot\Process\identify
+     */
+    public function identifies_no_processes()
+    {
+        $this->assertNull(identify("test-process"));
+    }
+
+    /**
+     * @test
+     * @covers HelpfulRobot\Process\identify
+     * @covers HelpfulRobot\Process\start
+     * @covers HelpfulRobot\Process\stop
+     */
+    public function starts_and_stops_processes()
+    {
+        $tag = "test-process";
+        $script = "php -r 'while (true);'";
+        $path = .."/test-process.log";
+
+        start($tag, $script, $path);
+
+        $this->assertNotNull(identify($tag));
+        $this->assertTrue(file_exists($path));
+
+        stop($tag);
+
+        $this->assertNull(identify($tag));
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        $path = .."/test-process.log";
+
+        if (file_exists($path)) {
+            unlink($path);
+        }
+    }
+}

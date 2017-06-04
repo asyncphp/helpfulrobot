@@ -1,5 +1,7 @@
+coverage
 vendor
 app/**/*.php
+tests/**/*.php
 scripts/*.php
 aerys.log
 pre.paths

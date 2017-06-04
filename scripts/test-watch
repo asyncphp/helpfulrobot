@@ -3,33 +3,25 @@
 
 require_once __DIR__ . "/../bootstrap/tests.php";
 
-Pre\Plugin\process(__DIR__ . "/../helpers.php");
-
 use Symfony\Component\Finder\Finder;
 use Yosymfony\ResourceWatcher\ResourceWatcher;
 use Yosymfony\ResourceWatcher\ResourceCacheFile;
-
-use function HelpfulRobot\Process\start;
-use function HelpfulRobot\Process\stop;
 
 $finder = new Finder();
 
 $finder->files()
     ->name("*.pre")
-    ->in(__DIR__ . "/../app");
+    ->in([
+        __DIR__ . "/../app",
+        __DIR__ . "/../tests",
+    ]);
 
 $cache = new ResourceCacheFile(
-    __DIR__ . "/.dev-changes.php"
+    __DIR__ . "/.test-changes.php"
 );
 
 $watcher = new ResourceWatcher($cache);
 $watcher->setFinder($finder);
-
-start(
-    "hr-watcher",
-    "PRE_DISABLE_AUTOLOAD=1 vendor/bin/aerys -d -c loader.php",
-    "aerys.log"
-);
 
 while (true) {
     $watcher->findChanges();
@@ -50,15 +42,7 @@ while (true) {
             Pre\Plugin\compile($pre, $php, true, true);
         }
 
-        print "Restarting the server" . PHP_EOL;
-
-        stop("hr-watcher");
-
-        start(
-            "hr-watcher",
-            "PRE_DISABLE_AUTOLOAD=1 vendor/bin/aerys -d -c loader.php",
-            "aerys.log"
-        );
+        passthru("HELPFULROBOT_NO_REBUILD=1 composer run test");
     }
 
     usleep(100000);
