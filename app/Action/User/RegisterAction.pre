@@ -1,0 +1,40 @@
+<?php
+
+namespace HelpfulRobot\Action\User;
+
+use function HelpfulRobot\Database\prepare;
+
+class RegisterAction
+{
+    async public function run($parameters = [])
+    {
+        $inserted = await $this->insertUser([
+            "email" => $parameters["email"],
+            "password" => $parameters["password"],
+        ]);
+
+        $fetched = await $this->fetchUser([
+            "id" => $inserted->insertId,
+        ]);
+
+        return $fetched;
+    }
+
+    async private function insertUser($values)
+    {
+        $query = "INSERT INTO users (email, password, created_at) VALUES (:email, :password, NOW())";
+        $result = await prepare($query, $values);
+
+        return $result;
+    }
+
+    async private function fetchUser($values)
+    {
+        $query = "SELECT * FROM users WHERE id = :id LIMIT 1";
+        $result = await prepare($query, $values);
+
+        $row = await $result->fetchObject();
+
+        return $row;
+    }
+}

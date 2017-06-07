@@ -9,3 +9,4 @@ config.php
 helpers.php
 routes.php
 macros.php
+.env

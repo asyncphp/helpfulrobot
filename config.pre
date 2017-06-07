@@ -1,7 +1,5 @@
 <?php
 
-process .."/helpers.pre";
-
 use Aerys\Host;
 use Aerys\Request;
 use Aerys\Response;

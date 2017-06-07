@@ -3,39 +3,11 @@
 use Aerys\Request;
 use Aerys\Response;
 use Aerys\Router;
-use HelpfulRobot\Responder\IndexResponder;
-use HelpfulRobot\Responder\RobotsResponder;
+use HelpfulRobot\Responder\User;
 
 return function (Router $router) {
-    $router->get(
-        "/", IndexResponder->new()->closure()
+    $router->post(
+        "/user/register",
+        User\RegisterResponder->new()->closure()
     );
-
-    $router->get(
-        "/robots", RobotsResponder->new()->closure()
-    );
-
-    // $router->get(
-    //     "/{name}", function(Request $req, Response $res, array $params) {
-    //         $res->end("hello " . $params["name"]);
-    //     }
-    // );
-    //
-    // $router->post(
-    //     "/", function(Request $req, Response $res) {
-    //         $res->end("hello world: post");
-    //     }
-    // );
-    //
-    // $router->put(
-    //     "/", function(Request $req, Response $res) {
-    //         $res->end("hello world: put");
-    //     }
-    // );
-    //
-    // $router->route(
-    //     "DELETE", "/", function(Request $req, Response $res) {
-    //         $res->end("hello world: delete");
-    //     }
-    // );
 };

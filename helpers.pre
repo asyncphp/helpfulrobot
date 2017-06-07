@@ -1,35 +1,72 @@
 <?php
 
-namespace HelpfulRobot\Process
+namespace HelpfulRobot\Process;
+
+function start($tag, $command, $log = null)
 {
-    function start($tag, $command, $log = null)
-    {
-        $file = $log ?? sha1($command);
-        $path = "> {$file} 2> {$file}";
+    $file = $log ?? sha1($command);
+    $path = "> {$file} 2> {$file}";
 
-        exec("{$command} tag={$tag} {$path} &");
+    exec("{$command} tag={$tag} {$path} &");
 
-        return identify($tag);
+    return identify($tag);
+}
+
+function identify($tag)
+{
+    exec("ps -ax | grep '[t]ag={$tag}'", $lines);
+
+    if (count($lines) < 1) {
+        return null;
     }
 
-    function identify($tag)
-    {
-        exec("ps -ax | grep '[t]ag={$tag}'", $lines);
+    $parts = explode(" ", trim($lines[0]));
+    return (int) $parts[0];
+}
 
-        if (count($lines) < 1) {
-            return null;
-        }
+function stop($tag)
+{
+    $pid = identify($tag);
 
-        $parts = explode(" ", trim($lines[0]));
-        return (int) $parts[0];
+    if ($pid !== null) {
+        exec("kill -9 {$pid}");
+    }
+}
+
+namespace HelpfulRobot\Database;
+
+use Amp\Mysql\Connection;
+
+async function connect()
+{
+    static $connection;
+
+    if ($connection) {
+        return $connection;
     }
 
-    function stop($tag)
-    {
-        $pid = identify($tag);
+    $host = getenv("DB_HOST");
+    $port = getenv("DB_PORT");
+    $name = getenv("DB_NAME");
+    $user = getenv("DB_USER");
+    $pass = getenv("DB_PASS");
 
-        if ($pid !== null) {
-            exec("kill -9 {$pid}");
-        }
-    }
+    $connection = new Connection(
+        "host={$host}:{$port};user={$user};pass={$pass}"
+    );
+
+    await $connection->connect();
+    await $connection->useDb($name);
+
+    return $connection;
+}
+
+async function prepare($query, $values)
+{
+    $connection = await connect();
+
+    $statement = await $connection->prepare($query);
+    $result = await $statement->execute($values);
+
+    return $result;
 }

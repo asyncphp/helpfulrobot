@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__ . "/vendor/autoload.php";
-
-Pre\Plugin\addMacroPath(__DIR__ . "/macros.pre");
+require_once __DIR__ . "/bootstrap/environment.php";
 
 Pre\Plugin\process(__DIR__ . "/config.pre");

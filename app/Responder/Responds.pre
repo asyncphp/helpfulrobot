@@ -2,6 +2,8 @@
 
 namespace HelpfulRobot\Responder;
 
+use Aerys\Request;
+use Aerys\Response;
 use Closure;
 
 trait Responds
@@ -9,5 +11,29 @@ trait Responds
     public function closure()
     {
         return Closure::fromCallable([$this, "run"]);
+    }
+
+    async private function parameters(Request $request)
+    {
+        $body = await $request->getBody();
+        parse_str($body, $data);
+
+        return $data;
+    }
+
+    async private function respond(Response $response, $status, $data = [])
+    {
+        $payload = [
+            "status" => $status,
+        ];
+
+        if (count($data)) {
+            $payload["data"] = $data;
+        }
+
+        $response
+            ->setHeader("Content-type", "text/json")
+            ->setStatus(200)
+            ->end(json_encode($payload));
     }
 }

@@ -1,0 +1,22 @@
+<?php
+
+namespace HelpfulRobot\Responder\User;
+
+use Aerys\Request;
+use Aerys\Response;
+use HelpfulRobot\Action\User\RegisterAction;
+use HelpfulRobot\Responder\Responds;
+
+class RegisterResponder
+{
+    use Responds;
+
+    public function run(Request $request, Response $response)
+    {
+        $parameters = await $this->parameters($request);
+
+        $row = await RegisterAction->new()->run($parameters);
+
+        await $this->respond($response, "ok", $row);
+    }
+}
