@@ -1,0 +1,37 @@
+<?php
+
+namespace HelpfulRobot\Responder\User;
+
+use Aerys\Request;
+use Aerys\Response;
+use HelpfulRobot\Action\User\LoginAction;
+use HelpfulRobot\Responder\Responds;
+
+class LoginResponder
+{
+    use Responds;
+
+    public function run(Request $request, Response $response)
+    {
+        $errors = {};
+        $parameters = await $this->parameters($request);
+
+        if (await $this->errors($parameters, $response)) {
+            return;
+        }
+
+        if ($row = await LoginAction->new()->run($parameters)) {
+            await $this->respond(
+                $response, 200, "ok", $row->without(
+                    "deleted_at",
+                    "password",
+                    "salt"
+                )
+            );
+        } else {
+            await $this->respond(
+                $response, 401, "error", "Invalid credentials"
+            );
+        }
+    }
+}

@@ -5,6 +5,7 @@ namespace HelpfulRobot\Responder;
 use Aerys\Request;
 use Aerys\Response;
 use Closure;
+use Pre\Collections\Collection;
 
 trait Responds
 {
@@ -18,22 +19,48 @@ trait Responds
         $body = await $request->getBody();
         parse_str($body, $data);
 
-        return $data;
+        return {$data};
     }
 
-    async private function respond(Response $response, $status, $data = [])
+    async private function respond(Response $response, $code, $status, $data = [])
     {
         $payload = [
             "status" => $status,
         ];
 
         if (count($data)) {
-            $payload["data"] = $data;
+            $payload["data"] =
+                $data instanceof Collection
+                    ? $data->toArray()
+                    : $data;
         }
 
         $response
             ->setHeader("Content-type", "text/json")
-            ->setStatus(200)
+            ->setStatus($code)
             ->end(json_encode($payload));
+    }
+
+    async private function errors($parameters, Response $response)
+    {
+        $validator = str_replace(
+            "Responder", "Validator", static::class
+        );
+
+        if (!class_exists($validator)) {
+            return false;
+        }
+
+        $errors = await (new $validator())->run($parameters);
+
+        if ($errors->length()) {
+            await $this->respond(
+                $response, 400, "error", $errors
+            );
+
+            return true;
+        }
+
+        return false;
     }
 }

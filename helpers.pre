@@ -36,6 +36,7 @@ function stop($tag)
 namespace HelpfulRobot\Database;
 
 use Amp\Mysql\Connection;
+use Pre\Collections\Collection;
 
 async function connect()
 {
@@ -66,7 +67,26 @@ async function prepare($query, $values)
     $connection = await connect();
 
     $statement = await $connection->prepare($query);
-    $result = await $statement->execute($values);
+
+    $result = await $statement->execute(
+        $values instanceof Collection
+        ? $values->toArray()
+        : $values
+    );
 
     return $result;
+}
+
+namespace HelpfulRobot\Crypto;
+
+function hash($plain, $cost = 10)
+{
+    return password_hash($plain, PASSWORD_BCRYPT, [
+        "cost" => $cost,
+    ]);
+}
+
+function verify($plain, $hash)
+{
+    return password_verify($plain, $hash);
 }

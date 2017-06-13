@@ -1,0 +1,29 @@
+<?php
+
+namespace HelpfulRobot\Action\User;
+
+use function HelpfulRobot\Crypto\verify;
+use function HelpfulRobot\Database\prepare;
+
+class LoginAction
+{
+    async public function run($parameters = [])
+    {
+        $parameters = {$parameters};
+
+        if ($row = await FindByEmailAction->new()->run($parameters)) {
+            if (verify($parameters->password . $row->salt, $row->password)) {
+                $token = bin2hex(random_bytes(32));
+
+                await prepare("UPDATE users SET token = :token WHERE id = :id LIMIT 1", {
+                    "token" => $token,
+                    "id" => $row->id,
+                });
+
+                $row->token = $token;
+
+                return {$row};
+            }
+        }
+    }
+}

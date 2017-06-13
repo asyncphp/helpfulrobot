@@ -1,0 +1,22 @@
+<?php
+
+namespace HelpfulRobot\Action\User;
+
+use function HelpfulRobot\Database\prepare;
+
+class FindByEmailAction
+{
+    async public function run($parameters = [])
+    {
+        $parameters = {$parameters};
+
+        $result = await prepare(
+            "SELECT * FROM users WHERE email = :email",
+            {"email" => $parameters->email}
+        );
+
+        $row = await $result->fetchObject();
+
+        return $row;
+    }
+}

@@ -10,4 +10,9 @@ return function (Router $router) {
         "/user/register",
         User\RegisterResponder->new()->closure()
     );
+
+    $router->post(
+        "/user/login",
+        User\LoginResponder->new()->closure()
+    );
 };

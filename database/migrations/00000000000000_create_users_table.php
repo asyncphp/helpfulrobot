@@ -11,6 +11,7 @@ class CreateUsersTable extends AbstractMigration
         $this->table("users")
             ->addColumn("email", "string")
             ->addColumn("password", "string")
+            ->addColumn("salt", "string")
             ->addColumn("token", "string", $nullable)
             ->addColumn("created_at", "datetime")
             ->addColumn("updated_at", "datetime", $nullable)

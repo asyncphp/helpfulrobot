@@ -13,10 +13,17 @@ class RegisterResponder
 
     public function run(Request $request, Response $response)
     {
+        $errors = {};
         $parameters = await $this->parameters($request);
+
+        if (await $this->errors($parameters, $response)) {
+            return;
+        }
 
         $row = await RegisterAction->new()->run($parameters);
 
-        await $this->respond($response, "ok", $row);
+        await $this->respond(
+            $response, 200, "ok", $row
+        );
     }
 }

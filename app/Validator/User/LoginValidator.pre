@@ -1,0 +1,22 @@
+<?php
+
+namespace HelpfulRobot\Validator\User;
+
+class LoginValidator
+{
+    async public function run($parameters = [])
+    {
+        $errors = {};
+        $parameters = {$parameters};
+
+        if (!$parameters->email) {
+            $errors->email = "Email is required";
+        }
+
+        if (!$parameters->password) {
+            $errors->password = "Password is required";
+        }
+
+        return $errors;
+    }
+}

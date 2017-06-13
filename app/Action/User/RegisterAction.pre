@@ -2,27 +2,33 @@
 
 namespace HelpfulRobot\Action\User;
 
+use function HelpfulRobot\Crypto\hash;
 use function HelpfulRobot\Database\prepare;
 
 class RegisterAction
 {
     async public function run($parameters = [])
     {
-        $inserted = await $this->insertUser([
-            "email" => $parameters["email"],
-            "password" => $parameters["password"],
-        ]);
+        $parameters = {$parameters};
 
-        $fetched = await $this->fetchUser([
+        $inserted = await $this->insertUser({
+            "email" => $parameters->email,
+            "password" => $parameters->password,
+        });
+
+        $fetched = await $this->fetchUser({
             "id" => $inserted->insertId,
-        ]);
+        });
 
         return $fetched;
     }
 
     async private function insertUser($values)
     {
-        $query = "INSERT INTO users (email, password, created_at) VALUES (:email, :password, NOW())";
+        $values->salt = bin2hex(random_bytes(32));
+        $values->password = hash($values->password . $values->salt);
+
+        $query = "INSERT INTO users (email, password, salt, created_at) VALUES (:email, :password, :salt, NOW())";
         $result = await prepare($query, $values);
 
         return $result;

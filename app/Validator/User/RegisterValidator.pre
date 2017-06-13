@@ -1,0 +1,40 @@
+<?php
+
+namespace HelpfulRobot\Validator\User;
+
+use HelpfulRobot\Action\User\FindByEmailAction;
+
+class RegisterValidator
+{
+    async public function run($parameters = [])
+    {
+        $errors = {};
+        $parameters = {$parameters};
+
+        {
+            $email,
+            $password,
+            $password_confirmation,
+        } = $parameters;
+
+        if ($email) {
+            if (await FindByEmailAction->new()->run($parameters)) {
+                $errors->email = "Email must be unique";
+            }
+        } else {
+            $errors->email = "Email is required";
+        }
+
+        if (!$password) {
+            $errors->password = "Password is required";
+        }
+
+        if (!$password_confirmation) {
+            $errors->password_confirmation = "You must confirm your password";
+        } else if ($password_confirmation !== $password) {
+            $errors->password_confirmation = "Your passwords do not match";
+        }
+
+        return $errors;
+    }
+}
