@@ -1,0 +1,19 @@
+<?php
+
+namespace HelpfulRobot\Transformer;
+
+use League\Fractal\TransformerAbstract;
+
+class UserTransformer extends TransformerAbstract
+{
+    public function transform($user)
+    {
+        $user = {$user};
+
+        return $user->without(
+            "deleted_at",
+            "password",
+            "salt"
+        )->toArray();
+    }
+}

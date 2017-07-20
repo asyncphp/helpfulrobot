@@ -6,6 +6,7 @@ use Aerys\Request;
 use Aerys\Response;
 use HelpfulRobot\Action\User\LoginAction;
 use HelpfulRobot\Responder\Responds;
+use HelpfulRobot\Transformer\UserTransformer;
 
 class LoginResponder
 {
@@ -22,15 +23,15 @@ class LoginResponder
 
         if ($row = await LoginAction->new()->run($parameters)) {
             await $this->respond(
-                $response, 200, "ok", $row->without(
-                    "deleted_at",
-                    "password",
-                    "salt"
+                $response, 200, "ok", $this->transformItem(
+                    $row, UserTransformer->new()
                 )
             );
         } else {
             await $this->respond(
-                $response, 401, "error", "Invalid credentials"
+                $response, 401, "error", {
+                    "error" => "Invalid credentials",
+                }
             );
         }
     }

@@ -70,8 +70,8 @@ async function prepare($query, $values)
 
     $result = await $statement->execute(
         $values instanceof Collection
-        ? $values->toArray()
-        : $values
+            ? $values->toArray()
+            : $values
     );
 
     return $result;

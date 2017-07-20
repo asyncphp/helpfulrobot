@@ -5,6 +5,9 @@ namespace HelpfulRobot\Responder;
 use Aerys\Request;
 use Aerys\Response;
 use Closure;
+use League\Fractal\Manager;
+use League\Fractal\Resource;
+use League\Fractal\TransformerAbstract;
 use Pre\Collections\Collection;
 
 use function Aerys\parseBody;
@@ -38,16 +41,22 @@ trait Responds
         ];
 
         if (count($data)) {
-            $payload["data"] =
-                $data instanceof Collection
-                    ? $data->toArray()
-                    : $data;
+            $payload = array_merge(
+                $payload, $this->arrayFrom($data)
+            );
         }
 
         $response
             ->setHeader("Content-type", "text/json")
             ->setStatus($code)
             ->end(json_encode($payload));
+    }
+
+    private function arrayFrom($data)
+    {
+        return $data instanceof Collection
+            ? $data->toArray()
+            : (array) $data;
     }
 
     async private function errors($parameters, Response $response)
@@ -64,12 +73,40 @@ trait Responds
 
         if ($errors->length()) {
             await $this->respond(
-                $response, 400, "error", $errors
+                $response, 400, "error", {
+                    "errors" => $errors,
+                }
             );
 
             return true;
         }
 
         return false;
+    }
+
+    private function transformCollection($data, TransformerAbstract $transformer)
+    {
+        $data = $this->arrayFrom($data);
+
+        $resource = Resource\Collection->new(
+            $data, $transformer
+        );
+
+        return Manager->new()
+            ->createData($resource)
+            ->toArray();
+    }
+
+    private function transformItem($data, TransformerAbstract $transformer)
+    {
+        $data = $this->arrayFrom($data);
+
+        $resource = Resource\Item->new(
+            $data, $transformer
+        );
+
+        return Manager->new()
+            ->createData($resource)
+            ->toArray();
     }
 }

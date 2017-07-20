@@ -6,6 +6,7 @@ use Aerys\Request;
 use Aerys\Response;
 use HelpfulRobot\Action\User\RegisterAction;
 use HelpfulRobot\Responder\Responds;
+use HelpfulRobot\Transformer\UserTransformer;
 
 class RegisterResponder
 {
@@ -23,7 +24,9 @@ class RegisterResponder
         $row = await RegisterAction->new()->run($parameters);
 
         await $this->respond(
-            $response, 200, "ok", $row
+            $response, 200, "ok", $this->transformItem(
+                $row, UserTransformer->new()
+            )
         );
     }
 }
