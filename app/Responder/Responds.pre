@@ -7,6 +7,8 @@ use Aerys\Response;
 use Closure;
 use Pre\Collections\Collection;
 
+use function Aerys\parseBody;
+
 trait Responds
 {
     public function closure()
@@ -16,10 +18,17 @@ trait Responds
 
     async private function parameters(Request $request)
     {
-        $body = await $request->getBody();
-        parse_str($body, $data);
+        $parsed = await parseBody($request);
 
-        return {$data};
+        $data = array_map(($item) => {
+            if (is_array($item) && count($item) < 2) {
+                return $item[0];
+            }
+
+            return $item;
+        }, $parsed->getAll()["fields"]);
+
+        return $data;
     }
 
     async private function respond(Response $response, $code, $status, $data = [])
