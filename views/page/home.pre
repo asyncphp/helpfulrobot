@@ -1,5 +1,12 @@
 <?php $this->layout("layout") ?>
 
-<?php call_user_func(() => {
-    print "home page";
-}) ?>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <ol>
+                <li><a href="/register">register</a></li>
+                <li><a href="/login">log in</a></li>
+            </ol>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+<?php
+
+namespace HelpfulRobot\Responder\Page;
+
+use Aerys\Request;
+use Aerys\Response;
+use HelpfulRobot\Responder\Responds;
+
+class LoginResponder
+{
+    use Responds;
+
+    public function run(Request $request, Response $response)
+    {
+        await $this->html($response, "page/login");
+    }
+}

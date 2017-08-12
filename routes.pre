@@ -12,6 +12,16 @@ return function (Router $router) {
         Page\HomeResponder->new()->closure()
     );
 
+    $router->get(
+        "/register",
+        Page\RegisterResponder->new()->closure()
+    );
+
+    $router->get(
+        "/login",
+        Page\LoginResponder->new()->closure()
+    );
+
     $router->post(
         "/user/register",
         User\RegisterResponder->new()->closure()
