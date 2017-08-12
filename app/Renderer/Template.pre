@@ -1,0 +1,20 @@
+<?php
+
+namespace HelpfulRobot\Renderer;
+
+use League\Plates\Template\Template as BaseTemplate;
+
+use function Pre\Plugin\compile;
+
+class Template extends BaseTemplate
+{
+    public function exists()
+    {
+        $php = $this->path();
+        $pre = preg_replace("/php$/", "pre", $php);
+
+        compile($pre, $php);
+
+        return parent::exists();
+    }
+}

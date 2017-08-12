@@ -2,6 +2,7 @@ coverage
 vendor
 app/**/*.php
 tests/**/*.php
+views/**/*.php
 scripts/*.php
 aerys.log
 pre.paths

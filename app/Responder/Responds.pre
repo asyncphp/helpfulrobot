@@ -5,12 +5,14 @@ namespace HelpfulRobot\Responder;
 use Aerys\Request;
 use Aerys\Response;
 use Closure;
+use HelpfulRobot\Renderer\Engine;
 use League\Fractal\Manager;
 use League\Fractal\Resource;
 use League\Fractal\TransformerAbstract;
 use Pre\Collections\Collection;
 
 use function Aerys\parseBody;
+use function HelpfulRobot\Process\defer;
 
 trait Responds
 {
@@ -34,22 +36,33 @@ trait Responds
         return $data;
     }
 
-    async private function respond(Response $response, $code, $status, $data = [])
+    async private function json(Response $response, $data = [], $status = "ok", $code = 200)
     {
-        $payload = [
-            "status" => $status,
-        ];
-
-        if (count($data)) {
-            $payload = array_merge(
-                $payload, $this->arrayFrom($data)
-            );
-        }
+        $payload = json_encode(
+            $this->arrayFrom($data) + [
+                "status" => $status,
+            ]
+        );
 
         $response
             ->setHeader("Content-type", "text/json")
             ->setStatus($code)
-            ->end(json_encode($payload));
+            ->end($payload);
+    }
+
+    async private function html(Response $response, $template, $data = [], $code = 200)
+    {
+        $templates = BASE_PATH . "/views";
+
+        $result = await defer(() => {
+            $engine = new Engine($templates);
+            return $engine->render($template, $this->arrayFrom($data));
+        });
+
+        $response
+            ->setHeader("Content-type", "text/html")
+            ->setStatus($code)
+            ->end($result);
     }
 
     private function arrayFrom($data)
@@ -72,10 +85,10 @@ trait Responds
         $errors = await (new $validator())->run($parameters);
 
         if ($errors->length()) {
-            await $this->respond(
-                $response, 400, "error", {
+            await $this->json(
+                $response, {
                     "errors" => $errors,
-                }
+                }, "error", 400
             );
 
             return true;

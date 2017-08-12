@@ -2,6 +2,11 @@
 
 namespace HelpfulRobot\Process;
 
+use Amp\Process;
+use Closure;
+use Exception;
+use SuperClosure\SerializableClosure;
+
 function start($tag, $command, $log = null)
 {
     $file = $log ?? sha1($command);
@@ -31,6 +36,30 @@ function stop($tag)
     if ($pid !== null) {
         exec("kill -9 {$pid}");
     }
+}
+
+async function defer(Closure $closure)
+{
+    $closure = new SerializableClosure($closure);
+    $encoded = base64_encode(serialize($closure));
+
+    $autoload = BASE_PATH . "/vendor/autoload.php";
+
+    $code = base64_encode("
+        require_once '{$autoload}';
+        \$data = unserialize(base64_decode('{$encoded}'));
+        \$closure = \$data->getClosure();
+        print serialize(\$closure());
+    ");
+
+    $process = new Process("php -r 'eval(base64_decode(\"{$code}\"));'");
+    $result = await $process->exec(Process::BUFFER_ALL);
+
+    if ($result->exit) {
+        throw new Exception($result->stderr);
+    }
+
+    return unserialize($result->stdout);
 }
 
 namespace HelpfulRobot\Database;

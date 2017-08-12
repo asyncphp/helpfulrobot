@@ -3,9 +3,15 @@
 use Aerys\Request;
 use Aerys\Response;
 use Aerys\Router;
+use HelpfulRobot\Responder\Page;
 use HelpfulRobot\Responder\User;
 
 return function (Router $router) {
+    $router->get(
+        "/",
+        Page\HomeResponder->new()->closure()
+    );
+
     $router->post(
         "/user/register",
         User\RegisterResponder->new()->closure()

@@ -22,16 +22,16 @@ class LoginResponder
         }
 
         if ($row = await LoginAction->new()->run($parameters)) {
-            await $this->respond(
-                $response, 200, "ok", $this->transformItem(
+            await $this->json(
+                $response, $this->transformItem(
                     $row, UserTransformer->new()
                 )
             );
         } else {
-            await $this->respond(
-                $response, 401, "error", {
+            await $this->json(
+                $response, {
                     "error" => "Invalid credentials",
-                }
+                }, "error", 401
             );
         }
     }

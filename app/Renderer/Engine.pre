@@ -1,0 +1,13 @@
+<?php
+
+namespace HelpfulRobot\Renderer;
+
+use League\Plates\Engine as BaseEngine;
+
+class Engine extends BaseEngine
+{
+    public function make($name)
+    {
+        return new Template($this, $name);
+    }
+}

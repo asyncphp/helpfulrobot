@@ -23,8 +23,8 @@ class RegisterResponder
 
         $row = await RegisterAction->new()->run($parameters);
 
-        await $this->respond(
-            $response, 200, "ok", $this->transformItem(
+        await $this->json(
+            $response, $this->transformItem(
                 $row, UserTransformer->new()
             )
         );

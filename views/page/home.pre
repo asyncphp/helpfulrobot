@@ -1,0 +1,5 @@
+<?php $this->layout("layout") ?>
+
+<?php call_user_func(() => {
+    print "home page";
+}) ?>
